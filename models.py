@@ -12,21 +12,25 @@ db = SQLAlchemy(metadata=metadata)
 class Album(db.Model, SerializerMixin):
     __tablename__ = 'albums'
 
-    id = db.Column(db.Integer, primary_key=True)
+    albumId = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
+    artistId = db.Column(db.Integer, db.ForeignKey('artists.artistId'))
     release_date = db.Column(db.Date)  # Add release date field
 
     artist = db.relationship('Artist', backref='albums')
 
     def __repr__(self):
-        return f'<Album {self.id}, {self.title}, {self.artist_id}>'
+        return f'<Album {self.albumId}, {self.title}, {self.artistId}, {self.release_date}>'
+    
+    serialize_only = ('albumId', 'title', 'artistId', 'release_date')
 
 class Artist(db.Model, SerializerMixin):
     __tablename__ = 'artists'
 
-    id = db.Column(db.Integer, primary_key=True)
+    artistId = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
     def __repr__(self):
-        return f'<Artist {self.id}, {self.name}>'
+        return f'<Artist {self.artistId}, {self.name}>'
+    
+    serialize_only = ('artistId', 'name')
