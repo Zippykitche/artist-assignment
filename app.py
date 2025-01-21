@@ -67,26 +67,30 @@ def get_all_albums():
 # Get the artist(s) for a specific album
 @app.route('/albums/<int:id>/artist', methods=['GET'])
 def get_artist_by_album(id):
-    artist = Album.query.filter(Album.artistId == id).first()
+    album = Album.query.filter(Album.albumId == id).first()
     
-    if artist:
-        body = [artist.to_dict() for artist in artist]  
+    if album and album.artist:  # Check if album exists and has an associated artist
+        body = album.artist.to_dict()  # Assuming the Artist model has a to_dict() method
         status = 200
     else:
-        body = {'message': f'No artists found for album {id}.'}
+        body = {'message': f'Artist not found for album {id}.'}
         status = 404
 
     return make_response(body, status)
 
 # Get the release date of an album
-@app.route('/albums/<int:id>/release_date', methods=['GET'])
+@app.route('/albums/<int:id>/releasedate', methods=['GET'])
 def get_album_release_date(id):
-    album = Album.query.get(id)
+    album = Album.query.filter(Album.albumId == id).first()
+    
     if album:
-        response = make_response(jsonify({"release_date": album.release_date}), 200)
+        body = {'release_date': album.release_date.strftime('%Y-%m-%d')} 
+        status = 200
     else:
-        response = make_response(jsonify({"error": "Album not found"}), 404)
-    return response
+        body = {'message': f'No release date found for album {id}.'}
+        status = 404
+
+    return make_response(body, status)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
